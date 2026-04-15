@@ -1,0 +1,83 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate?: Date;
+  updatedDate?: Date;
+  canonical?: string;
+  ogType?: 'website' | 'article';
+}
+
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  canonical,
+  ogType = 'website',
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const siteUrl = 'https://kyoza.github.io';
+const canonicalUrl = canonical ?? siteUrl + Astro.url.pathname;
+const siteName = 'Claude Code Tips JP';
+---
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} | {siteName}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={`${title} | ${siteName}`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:locale" content="ja_JP" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={`${title} | ${siteName}`} />
+    <meta name="twitter:description" content={description} />
+
+    {pubDate && <meta property="article:published_time" content={pubDate.toISOString()} />}
+    {updatedDate && <meta property="article:modified_time" content={updatedDate.toISOString()} />}
+
+    <!-- JSON-LD Article Schema -->
+    {ogType === 'article' && pubDate && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": title,
+        "description": description,
+        "datePublished": pubDate.toISOString(),
+        "dateModified": (updatedDate ?? pubDate).toISOString(),
+        "publisher": {
+          "@type": "Organization",
+          "name": siteName,
+          "url": siteUrl
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": canonicalUrl
+        }
+      })} />
+    )}
+  </head>
+  <body>
+    <Header />
+    <main style="max-width: 680px; margin: 0 auto; padding: 2rem 1rem 4rem;">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

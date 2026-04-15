@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kyoza.github.io/claude-code-tips/sitemap-index.xml

@@ -1,0 +1,58 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+
+const { post } = Astro.props;
+const base = import.meta.env.BASE_URL;
+
+const categoryLabels: Record<string, string> = {
+  'getting-started': '入門',
+  'tips': 'Tips',
+  'workflow': 'ワークフロー',
+  'comparison': '比較',
+  'troubleshooting': 'トラブル',
+  'advanced': '上級',
+};
+
+const difficultyLabels: Record<string, string> = {
+  beginner: '初級',
+  intermediate: '中級',
+  advanced: '上級',
+};
+
+const formattedDate = post.data.pubDate.toLocaleDateString('ja-JP', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+<article style="border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; background: var(--bg); transition: box-shadow 0.15s;">
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+    <span style="font-size: 0.72rem; background: var(--accent); color: white; padding: 0.2em 0.65em; border-radius: 4px; font-weight: 600;">
+      {categoryLabels[post.data.category]}
+    </span>
+    <span style="font-size: 0.72rem; background: var(--bg-muted); color: var(--text-muted); padding: 0.2em 0.65em; border-radius: 4px; border: 1px solid var(--border);">
+      {difficultyLabels[post.data.difficulty]}
+    </span>
+  </div>
+  <h2 style="font-size: 1.05rem; font-weight: 700; margin: 0 0 0.5rem; line-height: 1.5; border: none; padding: 0;">
+    <a href={`${base}/posts/${post.id}`} style="color: var(--text); text-decoration: none;">
+      {post.data.title}
+    </a>
+  </h2>
+  <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0 0 0.875rem; line-height: 1.6;">
+    {post.data.description}
+  </p>
+  <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.78rem; color: var(--text-muted);">
+    <time datetime={post.data.pubDate.toISOString()}>{formattedDate}</time>
+    <span>約{post.data.readingTime}分</span>
+    <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+      {post.data.tags.map((tag) => (
+        <span style="background: var(--bg-muted); border: 1px solid var(--border); border-radius: 3px; padding: 0.1em 0.5em;">#{tag}</span>
+      ))}
+    </div>
+  </div>
+</article>

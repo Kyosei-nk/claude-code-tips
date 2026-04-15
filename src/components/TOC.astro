@@ -1,0 +1,26 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+const h2headings = headings.filter((h) => h.depth === 2);
+---
+{h2headings.length > 0 && (
+  <nav aria-label="目次" style="background: var(--bg-muted); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; margin: 2rem 0;">
+    <p style="font-size: 0.875rem; font-weight: 700; margin: 0 0 0.75rem; color: var(--text);">目次</p>
+    <ol style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem; list-style: decimal;">
+      {h2headings.map((heading) => (
+        <li style="margin-bottom: 0.4rem; line-height: 1.5;">
+          <a href={`#${heading.slug}`} style="color: var(--text-muted);">{heading.text}</a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}

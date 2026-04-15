@@ -1,0 +1,92 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import TOC from '../components/TOC.astro';
+import Affiliate from '../components/Affiliate.astro';
+import RelatedPosts from '../components/RelatedPosts.astro';
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+const { post, headings } = Astro.props;
+const { title, description, pubDate, updatedDate, tags, category, difficulty, readingTime, affiliateLinks } = post.data;
+
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+
+const categoryLabels: Record<string, string> = {
+  'getting-started': '入門',
+  'tips': 'Tips',
+  'workflow': 'ワークフロー',
+  'comparison': '比較',
+  'troubleshooting': 'トラブルシューティング',
+  'advanced': '上級',
+};
+
+const difficultyLabels: Record<string, string> = {
+  beginner: '初級',
+  intermediate: '中級',
+  advanced: '上級',
+};
+
+const formattedPub = pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+const formattedUpd = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+<BaseLayout
+  title={title}
+  description={description}
+  pubDate={pubDate}
+  updatedDate={updatedDate}
+  ogType="article"
+>
+  <article>
+    <!-- パンくずリスト -->
+    <nav aria-label="パンくずリスト" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href={import.meta.env.BASE_URL} style="color: var(--text-muted);">ホーム</a>
+      <span>/</span>
+      <span>{categoryLabels[category]}</span>
+      <span>/</span>
+      <span style="color: var(--text);">{title}</span>
+    </nav>
+
+    <!-- メタ情報 -->
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+      <span style="font-size: 0.72rem; background: var(--accent); color: white; padding: 0.2em 0.65em; border-radius: 4px; font-weight: 600;">
+        {categoryLabels[category]}
+      </span>
+      <span style="font-size: 0.72rem; background: var(--bg-muted); color: var(--text-muted); padding: 0.2em 0.65em; border-radius: 4px; border: 1px solid var(--border);">
+        {difficultyLabels[difficulty]}
+      </span>
+    </div>
+
+    <h1 style="font-size: 1.75rem; font-weight: 800; line-height: 1.4; margin-bottom: 1rem;">{title}</h1>
+
+    <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 1.25rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+      <time datetime={pubDate.toISOString()}>公開: {formattedPub}</time>
+      {formattedUpd && <time datetime={updatedDate!.toISOString()}>更新: {formattedUpd}</time>}
+      <span>約{readingTime}分で読めます</span>
+    </div>
+
+    <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 2rem;">
+      {tags.map((tag) => (
+        <span style="font-size: 0.78rem; background: var(--bg-muted); border: 1px solid var(--border); border-radius: 3px; padding: 0.15em 0.55em; color: var(--text-muted);">#{tag}</span>
+      ))}
+    </div>
+
+    <!-- 目次 -->
+    <TOC headings={headings} />
+
+    <!-- 本文 -->
+    <slot />
+
+    <!-- アフィリエイト -->
+    {affiliateLinks && affiliateLinks.length > 0 && (
+      <Affiliate links={affiliateLinks} />
+    )}
+
+    <!-- 関連記事 -->
+    <RelatedPosts currentId={post.id} category={category} allPosts={allPosts} />
+  </article>
+</BaseLayout>

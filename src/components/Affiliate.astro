@@ -1,0 +1,32 @@
+---
+interface AffiliateLink {
+  service: string;
+  url: string;
+  label: string;
+}
+
+interface Props {
+  links: AffiliateLink[];
+}
+
+const { links } = Astro.props;
+---
+{links && links.length > 0 && (
+  <aside style="border: 2px solid var(--accent); border-radius: 10px; padding: 1.25rem 1.5rem; margin: 2.5rem 0; background: var(--bg-muted);">
+    <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 0.75rem; font-weight: 600;">PR・関連サービス</p>
+    {links.map((link) => (
+      <a
+        href={link.url}
+        target="_blank"
+        rel="noopener noreferrer sponsored"
+        style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 0.5rem; text-decoration: none; color: var(--text); font-size: 0.875rem;"
+      >
+        <span>
+          <span style="font-size: 0.72rem; background: var(--accent); color: white; padding: 0.15em 0.5em; border-radius: 3px; margin-right: 0.5rem; font-weight: 600;">{link.service}</span>
+          {link.label}
+        </span>
+        <span style="color: var(--accent); font-size: 0.8rem;">→</span>
+      </a>
+    ))}
+  </aside>
+)}
