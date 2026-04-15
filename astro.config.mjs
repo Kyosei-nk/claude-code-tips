@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://kyoza.github.io',
+  site: 'https://Kyosei-nk.github.io',
   base: '/claude-code-tips',
   vite: {
     plugins: [tailwindcss()],
